@@ -1,6 +1,5 @@
-package com.subafy.subafy.ui.theme
+package com.subafy.subafy.src.core.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,4 @@
-package com.subafy.subafy.ui.theme
+package com.subafy.subafy.src.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
