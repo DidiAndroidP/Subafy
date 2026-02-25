@@ -3,6 +3,8 @@ package com.subafy.subafy.src.features.dashboard.presentation.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +21,8 @@ import com.subafy.subafy.src.features.dashboard.presentation.viewModel.Dashboard
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel(),
-    onNavigateToAuctionLive: (String) -> Unit
+    onNavigateToAuctionLive: (String) -> Unit,
+    onNavigateToCreateAuction: () -> Unit
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
     val auctions by viewModel.auctions.collectAsState()
@@ -45,7 +48,16 @@ fun DashboardScreen(
 
     Scaffold(
         containerColor = Color(0xFFF9FAFB),
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateToCreateAuction,
+                containerColor = Color(0xFF1C64F2),
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Crear Subasta")
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
