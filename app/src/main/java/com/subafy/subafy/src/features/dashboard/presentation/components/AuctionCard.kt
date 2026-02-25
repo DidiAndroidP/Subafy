@@ -34,7 +34,7 @@ fun AuctionCard(
     currentPrice: Double,
     biddersCount: Int,
     timeRemaining: String,
-    imageUrl: String,
+    imageUrl: String?,
     onBidClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
