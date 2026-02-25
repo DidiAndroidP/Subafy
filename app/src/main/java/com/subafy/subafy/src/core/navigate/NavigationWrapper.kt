@@ -11,6 +11,7 @@ import com.subafy.subafy.src.features.auth.presentation.screens.IdentityScreen
 import com.subafy.subafy.src.features.auth.presentation.screens.ProfileScreen
 import com.subafy.subafy.src.features.auth.presentation.viewModel.AuthViewModel
 import com.subafy.subafy.src.features.dashboard.presentation.screens.DashboardScreen
+import com.subafy.subafy.src.features.auction.presentation.screens.CreateAuctionScreen
 
 @Composable
 fun NavigationWrapper() {
@@ -49,6 +50,20 @@ fun NavigationWrapper() {
             DashboardScreen(
                 onNavigateToAuctionLive = { auctionId ->
                     navController.navigate(Screens.AuctionLive.createRoute(auctionId))
+                },
+                onNavigateToCreateAuction = {
+                    navController.navigate(Screens.CreateAuction.route)
+                }
+            )
+        }
+
+        composable(route = Screens.CreateAuction.route) {
+            CreateAuctionScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onAuctionCreated = {
+                    navController.popBackStack()
                 }
             )
         }

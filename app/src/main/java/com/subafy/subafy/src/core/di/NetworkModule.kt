@@ -6,6 +6,7 @@ import com.subafy.subafy.src.features.auth.data.repositories.AuthWsApiImpl
 import com.subafy.subafy.src.features.auth.data.datasource.remote.api.AuthHttpApi
 import com.subafy.subafy.src.features.auth.data.datasource.remote.api.AuthWsApi
 import com.subafy.subafy.src.features.dashboard.data.datasource.remote.api.DashboardHttpApi
+import com.subafy.subafy.src.features.auction.data.datasource.remote.api.AuctionHttpApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -70,5 +71,11 @@ object NetworkModule {
         gson: Gson
     ): AuthWsApi {
         return AuthWsApiImpl(okHttpClient, gson)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuctionHttpApi(retrofit: Retrofit): AuctionHttpApi {
+        return retrofit.create(AuctionHttpApi::class.java)
     }
 }
