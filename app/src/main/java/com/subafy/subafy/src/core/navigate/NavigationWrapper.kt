@@ -12,6 +12,7 @@ import com.subafy.subafy.src.features.auth.presentation.screens.ProfileScreen
 import com.subafy.subafy.src.features.auth.presentation.viewModel.AuthViewModel
 import com.subafy.subafy.src.features.dashboard.presentation.screens.DashboardScreen
 import com.subafy.subafy.src.features.auction.presentation.screens.CreateAuctionScreen
+import com.subafy.subafy.src.features.dashboard.presentation.screens.AuctionScreen
 import com.subafy.subafy.src.features.dashboard.presentation.screens.ParticipantsScreen
 
 @Composable
@@ -69,10 +70,19 @@ fun NavigationWrapper() {
             )
         }
 
+
         composable(route = Screens.AuctionLive.route) { backStackEntry ->
             val auctionId = backStackEntry.arguments?.getString("auctionId") ?: return@composable
 
+            AuctionScreen(
+                onNavigateToResult = {
+                    navController.navigate(Screens.Dashboard.route) {
+                        popUpTo(Screens.Dashboard.route) { inclusive = true }
+                    }
+                }
+            )
         }
+
 
         composable(route = Screens.Participants.route) {
             ParticipantsScreen(
@@ -81,5 +91,6 @@ fun NavigationWrapper() {
                 }
             )
         }
+
     }
 }

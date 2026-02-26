@@ -31,7 +31,7 @@ import coil.compose.AsyncImage
 @Composable
 fun AuctionCard(
     productName: String,
-    currentPrice: Double,
+    currentPrice: String,
     biddersCount: Int,
     timeRemaining: String,
     imageUrl: String,
@@ -117,7 +117,7 @@ fun AuctionCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "$${String.format("%.2f", currentPrice)}",
+                            text = "$${String.format("%.2f", currentPrice.toDouble())}",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black

@@ -12,7 +12,9 @@ fun AuctionDto.toDomain(): Auction {
         status = this.status,
         startingPrice = this.startingPrice,
         productImageUrl = this.productImageUrl,
-        durationSeconds = this.durationSeconds ?: 0
+        durationSeconds = this.durationSeconds ?: 0,
+        createdAt = this.createdAt,
+        lotNumber = this.lotNumber
     )
 }
 
@@ -22,6 +24,9 @@ fun ActiveAuctionDto.toDomain(): ActiveAuction {
         productName = this.productName,
         status = this.status,
         startingPrice = this.startingPrice,
-        durationSeconds = this.durationSeconds ?: 0
+        productImageUrl = this.productImageUrl,
+        durationSeconds = this.durationSeconds ?: 0,
+        createdAt = this.createdAt,
+        lotNumber = this.lotNumber
     )
 }

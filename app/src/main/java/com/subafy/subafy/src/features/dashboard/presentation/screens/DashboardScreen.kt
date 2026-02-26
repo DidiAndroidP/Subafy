@@ -39,7 +39,7 @@ fun DashboardScreen(
 
     val filteredAuctions = auctions.filter {
         when (selectedCategory) {
-            "En Vivo" -> it.status == "active"
+            "En Vivo" -> it.status == "active" || it.status == "waiting"
             "Próximas" -> it.status == "upcoming"
             "Terminadas" -> it.status == "closed"
             else -> false

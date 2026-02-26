@@ -14,9 +14,9 @@ class DashboardRepositoryImpl @Inject constructor(
     override suspend fun getAuctions(): Result<List<Auction>> {
         return try {
             val response = api.getAuctions()
-            if (response.isSuccessful && response.body()?.success == true) {
-                val auctions = response.body()!!.data.map { it.toDomain() }
-                Result.success(auctions)
+            val data = response.body()?.data
+            if (response.isSuccessful && !data.isNullOrEmpty()) {
+                Result.success(data.map { it.toDomain() })
             } else {
                 Result.failure(Exception("Error fetching auctions: ${response.code()}"))
             }
@@ -28,11 +28,36 @@ class DashboardRepositoryImpl @Inject constructor(
     override suspend fun getActiveAuction(): Result<ActiveAuction> {
         return try {
             val response = api.getActiveAuction()
-            if (response.isSuccessful && response.body()?.success == true) {
-                val activeAuction = response.body()!!.data.toDomain()
-                Result.success(activeAuction)
+            val list = response.body()?.data
+            if (response.isSuccessful && !list.isNullOrEmpty()) {
+                Result.success(list.first().toDomain())
             } else {
-                Result.failure(Exception("Error fetching active auction: ${response.code()}"))
+                Result.failure(Exception("No active auction"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ── GET /auctions/:id ──────────────────────────────────────
+    override suspend fun getAuctionById(id: String): Result<Auction> {
+        return try {
+            val response = api.getAuctionById(id)
+            val dto = response.body()?.data
+            if (response.isSuccessful && dto != null) {
+                val auction = Auction(
+                    id              = dto.id,
+                    productName     = dto.productName,
+                    status          = dto.status,
+                    startingPrice   = dto.startingPrice,
+                    lotNumber       = dto.lotNumber,
+                    productImageUrl = dto.productImageUrl,
+                    durationSeconds = dto.durationSeconds,
+                    createdAt       = dto.createdAt
+                )
+                Result.success(auction)
+            } else {
+                Result.failure(Exception("Auction not found: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
