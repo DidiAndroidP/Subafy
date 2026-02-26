@@ -27,7 +27,7 @@ class AuthRepositoryImpl @Inject constructor(
             val response = httpApi.uploadAvatar(userIdBody, body)
 
             if (response.isSuccessful && response.body()?.success == true) {
-                val avatarUrl = response.body()!!.data.toDomainUrl()
+                val avatarUrl = response.body()!!.data!!.toDomainUrl()
                 Result.success(avatarUrl)
             } else {
                 Result.failure(Exception("Error al subir el avatar: ${response.code()}"))
