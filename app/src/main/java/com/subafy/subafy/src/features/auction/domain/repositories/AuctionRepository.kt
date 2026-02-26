@@ -1,8 +1,0 @@
-package com.subafy.subafy.src.features.auction.domain.repositories
-
-import com.subafy.subafy.src.features.auction.domain.entities.AuctionCreated
-import com.subafy.subafy.src.features.auction.domain.entities.CreateAuctionRequest
-
-interface AuctionRepository {
-    suspend fun createAuction(request: CreateAuctionRequest): Result<AuctionCreated>
-}
