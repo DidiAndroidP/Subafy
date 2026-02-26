@@ -11,12 +11,12 @@ data class AvatarUploadDto(
 )
 
 data class WsJoinPayloadDto(
-    val type: String = "join",
-    val userId: String,
-    val nickname: String,
+    val type:      String  = "join",
+    val auctionId: String,           // ← NUEVO
+    val userId:    String,
+    val nickname:  String,
     val avatarUrl: String? = null
 )
-
 
 data class AuctionDto(
     val id:              String,

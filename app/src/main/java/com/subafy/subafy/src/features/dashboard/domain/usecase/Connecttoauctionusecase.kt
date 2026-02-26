@@ -8,7 +8,12 @@ import javax.inject.Inject
 class ConnectToAuctionUseCase @Inject constructor(
     private val repository: AuctionRepositoryDetail
 ) {
-    operator fun invoke(): Flow<AuctionWsEvent> {
-        return repository.connect()
+    operator fun invoke(
+        auctionId: String,
+        userId:    String,
+        nickname:  String,
+        avatarUrl: String? = null
+    ): Flow<AuctionWsEvent> {
+        return repository.connect(auctionId, userId, nickname, avatarUrl)
     }
 }

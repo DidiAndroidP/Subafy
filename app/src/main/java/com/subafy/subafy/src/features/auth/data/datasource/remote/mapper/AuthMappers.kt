@@ -13,6 +13,7 @@ fun UserIdentity.toWsJoinPayloadDto(): WsJoinPayloadDto {
         type = "join",
         userId = this.userId,
         nickname = this.nickname,
-        avatarUrl = this.avatarUrl
+        avatarUrl = this.avatarUrl,
+        auctionId = this.auctionId
     )
 }

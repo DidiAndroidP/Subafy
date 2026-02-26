@@ -20,7 +20,7 @@ class AuctionWsApiImpl @Inject constructor(
     private var webSocket: WebSocket? = null
     private val _eventsFlow = MutableSharedFlow<String>(extraBufferCapacity = 64)
 
-    override fun connect() {
+    override fun connect(auctionId: String, userId: String, nickname: String, avatarUrl: String?) {
         if (webSocket != null) return
 
         val request = Request.Builder()
@@ -28,23 +28,29 @@ class AuctionWsApiImpl @Inject constructor(
             .build()
 
         webSocket = okHttpClient.newWebSocket(request, object : WebSocketListener() {
+            override fun onOpen(webSocket: WebSocket, response: Response) {
+                // Enviar join automáticamente al conectarse
+                val joinPayload = buildString {
+                    append("""{"type":"join","auctionId":"$auctionId","userId":"$userId","nickname":"$nickname"""")
+                    if (avatarUrl != null) append(""","avatarUrl":"$avatarUrl"""")
+                    append("}")
+                }
+                webSocket.send(joinPayload)
+                _eventsFlow.tryEmit("""{"type":"connected"}""")
+            }
+
             override fun onMessage(webSocket: WebSocket, text: String) {
                 _eventsFlow.tryEmit(text)
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 this@AuctionWsApiImpl.webSocket = null
-                // Emitir evento de desconexión para que el repo lo maneje
                 _eventsFlow.tryEmit("""{"type":"disconnected","data":{"reason":"$reason"}}""")
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 this@AuctionWsApiImpl.webSocket = null
                 _eventsFlow.tryEmit("""{"type":"disconnected","data":{"reason":"${t.message}"}}""")
-            }
-
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                _eventsFlow.tryEmit("""{"type":"connected"}""")
             }
         })
     }
@@ -55,8 +61,7 @@ class AuctionWsApiImpl @Inject constructor(
     }
 
     override fun sendBidEvent(payload: WsBidPayloadDto) {
-        val json = gson.toJson(payload)
-        webSocket?.send(json)
+        webSocket?.send(gson.toJson(payload))
     }
 
     override fun observeEvents(): Flow<String> = _eventsFlow.asSharedFlow()
