@@ -65,6 +65,7 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.core.telecom)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 

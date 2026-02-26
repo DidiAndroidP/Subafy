@@ -5,6 +5,7 @@ import com.subafy.subafy.src.features.auction.data.datasource.remote.mappers.toD
 import com.subafy.subafy.src.features.auction.data.datasource.remote.mappers.toDto
 import com.subafy.subafy.src.features.auction.domain.entities.AuctionCreated
 import com.subafy.subafy.src.features.auction.domain.entities.CreateAuctionRequest
+import com.subafy.subafy.src.features.auction.domain.entities.Participant
 import com.subafy.subafy.src.features.auction.domain.repositories.AuctionRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -41,6 +42,26 @@ class AuctionRepositoryImpl @Inject constructor(
                 }
             } else {
                 Result.failure(Exception("Error al crear subasta: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getParticipants(): Result<List<Participant>> {
+        return try {
+            val response = api.getParticipants()
+
+            if (response.isSuccessful && response.body()?.success == true) {
+                val data = response.body()?.data
+                if (data != null) {
+                    val domainList = data.map { it.toDomain() }
+                    Result.success(domainList)
+                } else {
+                    Result.success(emptyList())
+                }
+            } else {
+                Result.failure(Exception("Error al obtener participantes: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

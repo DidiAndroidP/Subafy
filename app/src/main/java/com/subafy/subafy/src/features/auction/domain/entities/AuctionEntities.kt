@@ -20,3 +20,12 @@ data class AuctionCreated(
     val status: String,
     val createdAt: String
 )
+
+data class Participant(
+    val id: String,
+    val nickname: String,
+    val avatarUrl: String?,
+    val bidCount: Int,
+    val isActive: Boolean,
+    val lastBidAt: String
+)

@@ -3,8 +3,10 @@ package com.subafy.subafy.src.features.auction.presentation.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -17,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.subafy.subafy.src.core.utils.toFile
 import com.subafy.subafy.src.features.auction.presentation.components.AuctionTextField
@@ -67,13 +70,27 @@ fun CreateAuctionScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Nueva Subasta", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        text = "Nueva Subasta",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        color = Color(0xFF111827)
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Regresar",
+                            tint = Color(0xFF111827)
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color(0xFF111827)
+                )
             )
         }
     ) { paddingValues ->
@@ -81,62 +98,85 @@ fun CreateAuctionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF3F4F6))
+                    .padding(horizontal = 24.dp, vertical = 32.dp)
+            ) {
+                ImagePickerBox(
+                    selectedImageUri = selectedImageUri,
+                    onPickImageClick = { imagePickerLauncher.launch("image/*") }
+                )
+            }
 
-            ImagePickerBox(
-                selectedImageUri = selectedImageUri,
-                onPickImageClick = { imagePickerLauncher.launch("image/*") }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(24.dp)
+            ) {
+                Text(
+                    text = "Información del artículo",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1F2937)
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            AuctionTextField(
-                value = productName,
-                onValueChange = { productName = it },
-                label = "Nombre del Producto"
-            )
+                AuctionTextField(
+                    value = productName,
+                    onValueChange = { productName = it },
+                    label = "Nombre del Producto"
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            AuctionTextField(
-                value = lotNumber,
-                onValueChange = { lotNumber = it },
-                label = "Número de Lote (Ej. 4421)"
-            )
+                AuctionTextField(
+                    value = lotNumber,
+                    onValueChange = { lotNumber = it },
+                    label = "Número de Lote (Ej. 4421)"
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            AuctionTextField(
-                value = startingPrice,
-                onValueChange = { startingPrice = it },
-                label = "Precio Inicial ($)",
-                keyboardType = KeyboardType.Number
-            )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    AuctionTextField(
+                        value = startingPrice,
+                        onValueChange = { startingPrice = it },
+                        label = "Precio ($)",
+                        keyboardType = KeyboardType.Number,
+                        modifier = Modifier.weight(1f)
+                    )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AuctionTextField(
-                value = durationMinutes,
-                onValueChange = { durationMinutes = it },
-                label = "Duración (Minutos)",
-                keyboardType = KeyboardType.Number
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            SubmitAuctionButton(
-                isLoading = isLoading,
-                onClick = {
-                    val file = selectedImageUri?.toFile(context)
-                    viewModel.createAuction(productName, lotNumber, startingPrice, durationMinutes, file)
+                    AuctionTextField(
+                        value = durationMinutes,
+                        onValueChange = { durationMinutes = it },
+                        label = "Minutos",
+                        keyboardType = KeyboardType.Number,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(48.dp))
+
+                SubmitAuctionButton(
+                    isLoading = isLoading,
+                    onClick = {
+                        val file = selectedImageUri?.toFile(context)
+                        viewModel.createAuction(productName, lotNumber, startingPrice, durationMinutes, file)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+            }
         }
     }
 }
