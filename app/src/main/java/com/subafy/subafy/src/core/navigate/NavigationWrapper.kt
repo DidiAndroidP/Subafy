@@ -19,12 +19,14 @@ import com.subafy.subafy.src.features.dashboard.presentation.screens.Participant
 fun NavigationWrapper() {
     val navController = rememberNavController()
 
+    // AuthViewModel compartido para acceder a userId/nickname desde cualquier pantalla
+    val authViewModel: AuthViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = Screens.Identity.route
     ) {
         composable(route = Screens.Identity.route) {
-            val authViewModel: AuthViewModel = hiltViewModel()
             val userId by authViewModel.userId.collectAsState()
 
             IdentityScreen(
@@ -49,9 +51,14 @@ fun NavigationWrapper() {
         }
 
         composable(route = Screens.Dashboard.route) {
+            val userId   by authViewModel.userId.collectAsState()
+            val nickname by authViewModel.nickname.collectAsState()
+
             DashboardScreen(
                 onNavigateToAuctionLive = { auctionId ->
-                    navController.navigate(Screens.AuctionLive.createRoute(auctionId))
+                    navController.navigate(
+                        Screens.AuctionLive.createRoute(auctionId, userId, nickname)
+                    )
                 },
                 onNavigateToCreateAuction = {
                     navController.navigate(Screens.CreateAuction.route)
@@ -61,19 +68,12 @@ fun NavigationWrapper() {
 
         composable(route = Screens.CreateAuction.route) {
             CreateAuctionScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onAuctionCreated = {
-                    navController.popBackStack()
-                }
+                onNavigateBack    = { navController.popBackStack() },
+                onAuctionCreated  = { navController.popBackStack() }
             )
         }
 
-
-        composable(route = Screens.AuctionLive.route) { backStackEntry ->
-            val auctionId = backStackEntry.arguments?.getString("auctionId") ?: return@composable
-
+        composable(route = Screens.AuctionLive.route) {
             AuctionScreen(
                 onNavigateToResult = {
                     navController.navigate(Screens.Dashboard.route) {
@@ -83,14 +83,10 @@ fun NavigationWrapper() {
             )
         }
 
-
         composable(route = Screens.Participants.route) {
             ParticipantsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
+                onNavigateBack = { navController.popBackStack() }
             )
         }
-
     }
 }

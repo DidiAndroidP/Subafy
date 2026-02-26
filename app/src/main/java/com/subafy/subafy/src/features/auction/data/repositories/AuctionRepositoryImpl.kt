@@ -4,6 +4,7 @@ import com.subafy.subafy.src.features.auction.data.datasource.remote.api.Auction
 import com.subafy.subafy.src.features.auction.data.datasource.remote.mappers.toDomain
 import com.subafy.subafy.src.features.auction.data.datasource.remote.mappers.toDto
 import com.subafy.subafy.src.features.auction.domain.entities.AuctionCreated
+import com.subafy.subafy.src.features.auction.domain.entities.AuctionFinalResult
 import com.subafy.subafy.src.features.auction.domain.entities.CreateAuctionRequest
 import com.subafy.subafy.src.features.auction.domain.entities.Participant
 import com.subafy.subafy.src.features.auction.domain.repositories.AuctionRepository
@@ -62,6 +63,25 @@ class AuctionRepositoryImpl @Inject constructor(
                 }
             } else {
                 Result.failure(Exception("Error al obtener participantes: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getFinalResult(auctionId: String): Result<AuctionFinalResult> {
+        return try {
+            val response = api.getFinalResult(auctionId)
+
+            if (response.isSuccessful && response.body()?.success == true) {
+                val data = response.body()?.data
+                if (data != null) {
+                    Result.success(data.toDomain())
+                } else {
+                    Result.failure(Exception("Respuesta exitosa pero sin datos del servidor"))
+                }
+            } else {
+                Result.failure(Exception("Error al obtener resultado final: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

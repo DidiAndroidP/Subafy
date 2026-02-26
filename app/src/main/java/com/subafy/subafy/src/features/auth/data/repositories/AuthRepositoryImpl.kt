@@ -38,12 +38,9 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override fun connectToAuctionRoom() {
-        wsApi.connect()
     }
 
     override fun joinAuction(identity: UserIdentity) {
-        val payloadDto = identity.toWsJoinPayloadDto()
-        wsApi.sendJoinEvent(payloadDto)
     }
 
     override fun getAuctionStateFlow(): Flow<String> {

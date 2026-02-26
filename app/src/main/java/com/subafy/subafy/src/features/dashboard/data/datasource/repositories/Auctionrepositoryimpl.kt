@@ -14,13 +14,13 @@ class AuctionRepositoryDetailImpl @Inject constructor(
     private val gson:  Gson
 ) : AuctionRepositoryDetail {
 
-    override fun connect(): Flow<AuctionWsEvent> {   // ← corregido
-        wsApi.connect()
+    override fun connect(auctionId: String, userId: String, nickname: String, avatarUrl: String?): Flow<AuctionWsEvent> {
+        wsApi.connect(auctionId, userId, nickname, avatarUrl)
         return wsApi.observeEvents().map { raw -> parseEvent(raw) }
     }
 
-    override fun placeBid(amount: Double) {
-        wsApi.sendBidEvent(WsBidPayloadDto(amount = amount))
+    override fun placeBid(auctionId: String, amount: Double) {
+        wsApi.sendBidEvent(WsBidPayloadDto(auctionId = auctionId, amount = amount))
     }
 
     override fun disconnect() {
@@ -153,9 +153,7 @@ class AuctionRepositoryDetailImpl @Inject constructor(
         val finalPrice: Double, val totalBids: Int, val totalParticipants: Int
     )
     private data class ParticipantJoinedRaw(val data: ParticipantJoinedData)
-    private data class ParticipantJoinedData(
-        val userId: String, val nickname: String, val totalConnected: Int
-    )
+    private data class ParticipantJoinedData(val userId: String, val nickname: String, val totalConnected: Int)
     private data class ParticipantLeftRaw(val data: ParticipantLeftData)
     private data class ParticipantLeftData(val userId: String, val totalConnected: Int)
 }
