@@ -125,7 +125,7 @@ fun DashboardScreen(
                             currentPrice = auction.startingPrice,
                             biddersCount = 0,
                             timeRemaining = auction.durationSeconds.toString(),
-                            imageUrl = auction.productImageUrl,
+                            imageUrl = auction.productImageUrl ?: "",
                             onBidClick = { onNavigateToAuctionLive(auction.id) }
                         )
                     }

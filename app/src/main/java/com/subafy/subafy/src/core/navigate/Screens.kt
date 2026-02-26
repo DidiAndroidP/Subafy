@@ -10,4 +10,5 @@ sealed class Screens(val route: String) {
     object AuctionLive : Screens("auction_live_screen/{auctionId}") {
         fun createRoute(auctionId: String) = "auction_live_screen/$auctionId"
     }
+    object Participants : Screens("participants_screen")
 }

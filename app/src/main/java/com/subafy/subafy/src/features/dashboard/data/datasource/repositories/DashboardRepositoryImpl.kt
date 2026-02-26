@@ -38,30 +38,4 @@ class DashboardRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
-    // ── GET /auctions/:id ──────────────────────────────────────
-    override suspend fun getAuctionById(id: String): Result<Auction> {
-        return try {
-            val response = api.getAuctionById(id)
-            if (response.isSuccessful && response.body()?.success == true) {
-                val dto = response.body()!!.data
-                // Reusar AuctionDto mapper mapeando manualmente desde AuctionDetailDto
-                val auction = Auction(
-                    id              = dto.id,
-                    productName     = dto.productName,
-                    status          = dto.status,
-                    startingPrice   = dto.startingPrice,
-                    lotNumber       = dto.lotNumber,
-                    productImageUrl = dto.productImageUrl,
-                    durationSeconds = dto.durationSeconds,
-                    createdAt       = dto.createdAt
-                )
-                Result.success(auction)
-            } else {
-                Result.failure(Exception("Auction not found: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 }

@@ -1,25 +1,18 @@
 package com.subafy.subafy.src.features.dashboard.domain.entities
 
-// ── Lista de subastas (GET /auctions) ─────────────────────────
 data class Auction(
-    val id:              String,
-    val productName:     String,
-    val status:          String,   // "waiting" | "active" | "closed"
-    val startingPrice:   Double,
-    val lotNumber:       String,
-    val productImageUrl: String?,  // ← nuevo
-    val durationSeconds: Int,      // ← nuevo
-    val createdAt:       String    // ← nuevo
+    val id: String,
+    val productName: String,
+    val status: String,
+    val startingPrice: Double,
+    val productImageUrl: String?,
+    val durationSeconds: Int
 )
 
-// ── Subasta activa (GET /auctions/active) ──────────────────────
 data class ActiveAuction(
-    val id:              String,
-    val productName:     String,
-    val status:          String,
-    val startingPrice:   Double,
-    val durationSeconds: Int,
-    val productImageUrl: String?,  // ← nuevo
-    val lotNumber:       String,   // ← nuevo
-    val createdAt: String
+    val id: String,
+    val productName: String,
+    val status: String,
+    val startingPrice: Double,
+    val durationSeconds: Int
 )
