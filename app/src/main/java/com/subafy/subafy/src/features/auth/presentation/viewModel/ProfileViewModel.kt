@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.subafy.subafy.src.features.auth.domain.entities.UserIdentity
 import com.subafy.subafy.src.features.auth.domain.usecase.JoinAuctionUseCase
 import com.subafy.subafy.src.features.auth.domain.usecase.UploadAvatarUseCase
+import com.subafy.subafy.src.features.dashboard.data.repositories.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val uploadAvatarUseCase: UploadAvatarUseCase,
-    private val joinAuctionUseCase: JoinAuctionUseCase
+    private val joinAuctionUseCase: JoinAuctionUseCase,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -46,6 +48,8 @@ class ProfileViewModel @Inject constructor(
                         return@launch
                     }
                 }
+
+                userPreferences.saveUser(nickname, finalAvatarUrl)
 
                 val identity = UserIdentity(
                     userId = userId,

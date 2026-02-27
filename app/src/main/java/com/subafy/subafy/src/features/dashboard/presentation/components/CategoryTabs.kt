@@ -21,7 +21,7 @@ fun CategoryTabs(
     onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val categories = listOf("En Vivo", "Próximas", "Terminadas")
+    val categories = listOf("En Vivo", "En espera", "Terminadas")
 
     LazyRow(
         modifier = modifier

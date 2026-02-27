@@ -54,6 +54,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -66,6 +67,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.core.telecom)
+    implementation(libs.androidx.datastore.core)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 

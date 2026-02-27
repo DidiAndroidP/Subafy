@@ -28,6 +28,9 @@ fun DashboardScreen(
     val auctions by viewModel.auctions.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    val userNickname by viewModel.nickname.collectAsState(initial = "Usuario")
+    val userAvatarUrl by viewModel.avatarUrl.collectAsState(initial = null)
+
     var selectedCategory by remember { mutableStateOf("En Vivo") }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -39,6 +42,8 @@ fun DashboardScreen(
 
     val filteredAuctions = auctions.filter {
         when (selectedCategory) {
+            "En Vivo" -> it.status == "active"
+            "En espera" -> it.status == "upcoming"
             "En Vivo" -> it.status == "active" || it.status == "waiting"
             "Próximas" -> it.status == "upcoming"
             "Terminadas" -> it.status == "closed"
@@ -65,8 +70,8 @@ fun DashboardScreen(
                 .padding(paddingValues)
         ) {
             DashboardTopBar(
-                nickname = "OferenteVeloz",
-                avatarUrl = null
+                nickname = userNickname,
+                avatarUrl = userAvatarUrl
             )
 
             CategoryTabs(
