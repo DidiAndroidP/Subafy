@@ -44,6 +44,8 @@ fun DashboardScreen(
         when (selectedCategory) {
             "En Vivo" -> it.status == "active"
             "En espera" -> it.status == "upcoming"
+            "En Vivo" -> it.status == "active" || it.status == "waiting"
+            "Próximas" -> it.status == "upcoming"
             "Terminadas" -> it.status == "closed"
             else -> false
         }

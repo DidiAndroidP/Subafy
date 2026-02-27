@@ -8,6 +8,10 @@ interface DashboardRepository {
     suspend fun getAuctions(): Result<List<Auction>>
     suspend fun getActiveAuction(): Result<ActiveAuction>
 
+ feature/pantallas-iniciales
     fun getUserNickname(): Flow<String>
     fun getUserAvatar(): Flow<String?>
+
+    suspend fun getAuctionById(id: String): Result<Auction>
+
 }

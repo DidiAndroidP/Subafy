@@ -17,8 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val uploadAvatarUseCase: UploadAvatarUseCase,
-    private val joinAuctionUseCase: JoinAuctionUseCase,
+    private val uploadAvatarUseCase:      UploadAvatarUseCase,
+    private val joinAuctionUseCase:       JoinAuctionUseCase,
     private val observeAuctionStateUseCase: ObserveAuctionStateUseCase
 ) : ViewModel() {
 
@@ -28,6 +28,13 @@ class AuthViewModel @Inject constructor(
     private val _userId = MutableStateFlow("")
     val userId: StateFlow<String> = _userId.asStateFlow()
 
+    // ← NUEVO: guardar nickname para pasarlo a AuctionLive
+    private val _nickname = MutableStateFlow("Anon")
+    val nickname: StateFlow<String> = _nickname.asStateFlow()
+
+    private val _avatarUrl = MutableStateFlow<String?>(null)
+    val avatarUrl: StateFlow<String?> = _avatarUrl.asStateFlow()
+
     private val _isJoined = MutableStateFlow(false)
     val isJoined: StateFlow<Boolean> = _isJoined.asStateFlow()
 
@@ -36,18 +43,17 @@ class AuthViewModel @Inject constructor(
 
     init {
         generateTemporaryId()
-        observeAuctionState()
     }
 
     private fun generateTemporaryId() {
-        val randomId = "user_" + UUID.randomUUID().toString().substring(0, 8)
-        _userId.value = randomId
+        _userId.value = "user_" + UUID.randomUUID().toString().substring(0, 8)
     }
 
     fun enterAuction(nickname: String = "Anon", avatarFile: File? = null, defaultAvatarUrl: String? = null) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
+            _nickname.value = nickname  // ← guardar nickname
 
             try {
                 var finalAvatarUrl: String? = defaultAvatarUrl
@@ -56,6 +62,7 @@ class AuthViewModel @Inject constructor(
                     val result = uploadAvatarUseCase(_userId.value, avatarFile)
                     result.onSuccess { url ->
                         finalAvatarUrl = url
+                        _avatarUrl.value = url
                     }.onFailure { exception ->
                         _isLoading.value = false
                         _error.value = "Error al subir imagen: ${exception.message}"
@@ -64,8 +71,8 @@ class AuthViewModel @Inject constructor(
                 }
 
                 val identity = UserIdentity(
-                    userId = _userId.value,
-                    nickname = nickname,
+                    userId    = _userId.value,
+                    nickname  = nickname,
                     avatarUrl = finalAvatarUrl
                 )
 
@@ -77,14 +84,6 @@ class AuthViewModel @Inject constructor(
             } catch (e: Exception) {
                 _isLoading.value = false
                 _error.value = "Error inesperado: ${e.message}"
-            }
-        }
-    }
-
-    private fun observeAuctionState() {
-        viewModelScope.launch {
-            observeAuctionStateUseCase().collect { stateJson ->
-
             }
         }
     }
