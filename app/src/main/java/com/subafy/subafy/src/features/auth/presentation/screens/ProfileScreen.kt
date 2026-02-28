@@ -26,11 +26,11 @@ import com.subafy.subafy.src.features.auth.presentation.viewModel.ProfileViewMod
 fun ProfileScreen(
     userId: String,
     viewModel: ProfileViewModel = hiltViewModel(),
-    onNavigateToDashboard: () -> Unit
+    onNavigateToDashboard: (nickname: String, avatarUrl: String?) -> Unit  // ← pasar datos
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
-    val isJoined by viewModel.isJoined.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val isJoined  by viewModel.isJoined.collectAsState()
+    val error     by viewModel.error.collectAsState()
 
     var nickname by remember { mutableStateOf("") }
     val dicebearUrl = AvatarGenerator.generateDicebearUrl(userId)
@@ -38,14 +38,13 @@ fun ProfileScreen(
 
     LaunchedEffect(isJoined) {
         if (isJoined) {
-            onNavigateToDashboard()
+            val finalNickname = nickname.ifEmpty { "Anon_${userId.takeLast(4)}" }
+            onNavigateToDashboard(finalNickname, dicebearUrl)  // ← pasar nickname y avatarUrl
         }
     }
 
     LaunchedEffect(error) {
-        error?.let {
-            snackbarHostState.showSnackbar(message = it)
-        }
+        error?.let { snackbarHostState.showSnackbar(message = it) }
     }
 
     Scaffold(
@@ -92,7 +91,6 @@ fun ProfileScreen(
                         .clip(CircleShape)
                         .background(Color(0xFFF3F4F6))
                 )
-
                 Box(
                     modifier = Modifier
                         .size(36.dp)
@@ -128,9 +126,7 @@ fun ProfileScreen(
                     color = Color.DarkGray,
                     fontWeight = FontWeight.Bold
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
-
                 OutlinedTextField(
                     value = nickname,
                     onValueChange = { if (it.length <= 20) nickname = it },
@@ -178,9 +174,7 @@ fun ProfileScreen(
                     )
                 },
                 enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF1C64F2),
                     disabledContainerColor = Color(0xFF93C5FD),

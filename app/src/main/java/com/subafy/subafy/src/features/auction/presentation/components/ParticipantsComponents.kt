@@ -116,7 +116,6 @@ fun ParticipantListItem(
     nickname: String,
     avatarUrl: String?,
     bidCount: Int,
-    timeAgo: String,
     isActive: Boolean,
     isWinner: Boolean,
     modifier: Modifier = Modifier
@@ -187,11 +186,6 @@ fun ParticipantListItem(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color.Black
-            )
-            Text(
-                text = timeAgo,
-                fontSize = 13.sp,
-                color = Color.Gray
             )
         }
 

@@ -69,14 +69,14 @@ class AuctionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getFinalResult(auctionId: String): Result<AuctionFinalResult> {
+    override suspend fun getFinalResult(auctionId: String, currentUserId: String): Result<AuctionFinalResult> {
         return try {
             val response = api.getFinalResult(auctionId)
 
             if (response.isSuccessful && response.body()?.success == true) {
                 val data = response.body()?.data
                 if (data != null) {
-                    Result.success(data.toDomain())
+                    Result.success(data.toDomain(currentUserId))
                 } else {
                     Result.failure(Exception("Respuesta exitosa pero sin datos del servidor"))
                 }
@@ -85,6 +85,20 @@ class AuctionRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun getAuctionParticipants(auctionId: String): Result<List<Participant>> {
+        return try {
+            val response = api.getAuctionParticipants(auctionId)
+            val data = response.body()?.data
+            if (response.isSuccessful && data != null) {
+                Result.success(data.map { it.toDomain() })
+            } else {
+                Result.success(emptyList())
+            }
+        } catch (e: Exception) {
+            Result.success(emptyList())
         }
     }
 }

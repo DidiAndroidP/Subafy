@@ -13,34 +13,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.subafy.subafy.src.features.dashboard.presentation.components.AuctionCard
 import com.subafy.subafy.src.features.dashboard.presentation.components.CategoryTabs
 import com.subafy.subafy.src.features.dashboard.presentation.components.DashboardTopBar
 import com.subafy.subafy.src.features.dashboard.presentation.viewModel.DashboardViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel(),
+    nickname: String = "Anon",          // ← agregar parámetro
+    avatarUrl: String? = null,          // ← agregar parámetro
     onNavigateToAuctionLive: (String) -> Unit,
     onNavigateToCreateAuction: () -> Unit
 ) {
-    val isLoading by viewModel.isLoading.collectAsState()
-    val auctions by viewModel.auctions.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var selectedCategory by remember { mutableStateOf("En Vivo") }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(error) {
-        error?.let {
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
             snackbarHostState.showSnackbar(message = it)
         }
     }
 
-    val filteredAuctions = auctions.filter {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.fetchDashboardData()  // ← solo recarga cuando la pantalla vuelve a estar visible
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    val filteredAuctions = uiState.auctions.filter {
         when (selectedCategory) {
-            "En Vivo" -> it.status == "active" || it.status == "waiting"
-            "Próximas" -> it.status == "upcoming"
+            "En Vivo" -> it.status == "active"
+            "Espera" -> it.status == "waiting"
             "Terminadas" -> it.status == "closed"
             else -> false
         }
@@ -65,8 +84,8 @@ fun DashboardScreen(
                 .padding(paddingValues)
         ) {
             DashboardTopBar(
-                nickname = "OferenteVeloz",
-                avatarUrl = null
+                nickname = nickname,
+                avatarUrl = avatarUrl
             )
 
             CategoryTabs(
@@ -76,27 +95,7 @@ fun DashboardScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "SUBASTAS POPULARES",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Ver todas >",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Color(0xFF8B5CF6),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            if (isLoading) {
+            if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center

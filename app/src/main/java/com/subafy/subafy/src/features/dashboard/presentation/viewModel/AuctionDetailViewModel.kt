@@ -6,46 +6,35 @@ import androidx.lifecycle.viewModelScope
 import com.subafy.subafy.src.features.dashboard.domain.entities.AuctionWsEvent
 import com.subafy.subafy.src.features.dashboard.domain.usecase.ConnectToAuctionUseCase
 import com.subafy.subafy.src.features.dashboard.domain.usecase.DisconnectFromAuctionUseCase
+import com.subafy.subafy.src.features.dashboard.domain.usecase.GetAuctionBidsUseCase
+import com.subafy.subafy.src.features.dashboard.domain.usecase.GetAuctionStatusUseCase
 import com.subafy.subafy.src.features.dashboard.domain.usecase.PlaceBidUseCase
 import com.subafy.subafy.src.features.dashboard.presentation.components.BidUiModel
+import com.subafy.subafy.src.features.dashboard.presentation.screens.AuctionUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
-data class AuctionUiState(
-    val productName:     String  = "",
-    val productSubtitle: String  = "",
-    val productImageUrl: String? = null,
-    val currentPrice:    Double  = 0.0,
-    val leaderNickname:  String? = null,
-    val timeRemaining:   Int     = 0,
-    val isActive:        Boolean = false,
-    val isFinished:      Boolean = false,
-    val bidIncrement:    Double  = 10.0
-)
 
 @HiltViewModel
 class AuctionDetailViewModel @Inject constructor(
-    savedStateHandle:              SavedStateHandle,
-    private val connectUseCase:    ConnectToAuctionUseCase,
-    private val placeBidUseCase:   PlaceBidUseCase,
-    private val disconnectUseCase: DisconnectFromAuctionUseCase
+    savedStateHandle:                  SavedStateHandle,
+    private val connectUseCase:        ConnectToAuctionUseCase,
+    private val placeBidUseCase:       PlaceBidUseCase,
+    private val disconnectUseCase:     DisconnectFromAuctionUseCase,
+    private val getAuctionBidsUseCase: GetAuctionBidsUseCase,
+    private val getAuctionStatusUseCase: GetAuctionStatusUseCase   // ← nuevo
 ) : ViewModel() {
 
-    // ── Parámetros de navegación ────────────────────────────────
-    private val auctionId: String = savedStateHandle["auctionId"] ?: ""
-    private val userId:    String = savedStateHandle["userId"]    ?: ""
-    private val nickname:  String = savedStateHandle["nickname"]  ?: "Anon"
+    private val auctionId: String  = savedStateHandle["auctionId"] ?: ""
+    private val userId:    String  = savedStateHandle["userId"]    ?: ""
+    private val nickname:  String  = savedStateHandle["nickname"]  ?: "Anon"
     private val avatarUrl: String? = savedStateHandle["avatarUrl"]
 
-    // ── Estado UI ───────────────────────────────────────────────
     private val _auctionState = MutableStateFlow(AuctionUiState())
     val auctionState: StateFlow<AuctionUiState> = _auctionState.asStateFlow()
 
@@ -64,7 +53,26 @@ class AuctionDetailViewModel @Inject constructor(
     private var priceBeforeBid: Double = 0.0
 
     init {
+        checkAuctionStatus()
+        loadBidHistory()
         observeEvents()
+    }
+
+    private fun checkAuctionStatus() {
+        viewModelScope.launch {
+            val status = getAuctionStatusUseCase(auctionId)
+            if (status == "closed") {
+                _auctionState.update { it.copy(isFinished = true) }
+            }
+        }
+    }
+
+    private fun loadBidHistory() {
+        viewModelScope.launch {
+            getAuctionBidsUseCase(auctionId).onSuccess { bids ->
+                _bidHistory.value = bids
+            }
+        }
     }
 
     private fun observeEvents() {
@@ -76,8 +84,7 @@ class AuctionDetailViewModel @Inject constructor(
 
     private fun handleEvent(event: AuctionWsEvent) {
         when (event) {
-            is AuctionWsEvent.Connected -> _isConnected.value = true
-
+            is AuctionWsEvent.Connected    -> _isConnected.value = true
             is AuctionWsEvent.Disconnected -> _isConnected.value = false
 
             is AuctionWsEvent.AuctionState -> {
@@ -112,19 +119,17 @@ class AuctionDetailViewModel @Inject constructor(
                     nickname  = event.nickname,
                     avatarUrl = event.avatarUrl,
                     amount    = event.newPrice,
-                    increment = _auctionState.value.bidIncrement,  // ← 10.0
+                    increment = _auctionState.value.bidIncrement,
                     timeAgo   = "ahora",
-                    isLeader  = true   // ← el que puja es el nuevo líder
+                    isLeader  = true
                 )
                 _bidHistory.update { currentList ->
-                    // El anterior líder ya no es líder
                     val updated = currentList.map { it.copy(isLeader = false) }
                     listOf(bid) + updated
                 }
             }
 
             is AuctionWsEvent.BidRejected -> {
-                // Rollback precio optimista
                 _auctionState.update { it.copy(currentPrice = priceBeforeBid) }
                 _bidError.value = event.reason
             }
@@ -137,15 +142,15 @@ class AuctionDetailViewModel @Inject constructor(
                 _auctionState.update { it.copy(isActive = false, isFinished = true) }
             }
 
-            is AuctionWsEvent.ParticipantJoined -> { /* opcional: mostrar notificación */ }
-            is AuctionWsEvent.ParticipantLeft   -> { /* opcional */ }
-            is AuctionWsEvent.Error             -> { /* opcional: mostrar snackbar */ }
+            is AuctionWsEvent.ParticipantJoined -> {}
+            is AuctionWsEvent.ParticipantLeft   -> {}
+            is AuctionWsEvent.Error             -> {}
         }
     }
 
     fun placeBid(amount: Double) {
         priceBeforeBid = _auctionState.value.currentPrice
-        _auctionState.update { it.copy(currentPrice = amount) } // optimistic
+        _auctionState.update { it.copy(currentPrice = amount) }
         _showBidModal.value = false
         placeBidUseCase(auctionId, amount)
     }
