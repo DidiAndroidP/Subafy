@@ -27,5 +27,5 @@ data class Participant(
     val avatarUrl: String?,
     val bidCount: Int,
     val isActive: Boolean,
-    val lastBidAt: String
+    val lastBidAt: String?
 )

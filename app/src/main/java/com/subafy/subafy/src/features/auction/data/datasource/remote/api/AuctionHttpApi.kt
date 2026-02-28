@@ -34,6 +34,12 @@ interface AuctionHttpApi {
     @GET("/participants")
     suspend fun getParticipants(): Response<BaseResponseDto<List<ParticipantDto>>>
 
+
+    @GET("/auctions/{id}/participants")
+    suspend fun getAuctionParticipants(
+        @Path("id") auctionId: String
+    ): Response<BaseResponseDto<List<ParticipantDto>>>
+
     @GET("/auctions/{auctionId}/result")
     suspend fun getFinalResult(
         @Path("auctionId") auctionId: String

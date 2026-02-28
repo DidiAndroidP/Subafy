@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetFinalResultUseCase @Inject constructor(
     private val repository: AuctionRepository
 ) {
-    suspend operator fun invoke(auctionId: String): Result<AuctionFinalResult> {
-        return repository.getFinalResult(auctionId)
+    suspend operator fun invoke(auctionId: String, currentUserId: String): Result<AuctionFinalResult> {
+        return repository.getFinalResult(auctionId, currentUserId)
     }
 }

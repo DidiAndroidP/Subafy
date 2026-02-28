@@ -16,6 +16,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import coil.compose.AsyncImage
 
 // ── Modelo de puja para la UI ──────────────────────────────────
@@ -122,9 +125,9 @@ fun BidHistoryItem(bid: BidUiModel) {
                 }
             }
             Text(
-                text     = bid.timeAgo,
+                text = formatDate(bid.timeAgo),
                 fontSize = 12.sp,
-                color    = Color(0xFF9CA3AF)
+                color = Color(0xFF9CA3AF)
             )
         }
 
@@ -149,4 +152,19 @@ fun BidHistoryItem(bid: BidUiModel) {
         thickness = 0.5.dp,
         color     = Color(0xFFF3F4F6)
     )
+}
+
+fun formatDate(isoDate: String): String {
+    return try {
+        val instant = Instant.parse(isoDate)
+
+        val formatter = DateTimeFormatter
+            .ofPattern("dd MMM yyyy • HH:mm")
+            .withZone(ZoneId.systemDefault())
+
+        formatter.format(instant)
+
+    } catch (e: Exception) {
+        isoDate // si no es una fecha válida, lo devuelve tal cual
+    }
 }

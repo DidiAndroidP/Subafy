@@ -50,3 +50,12 @@ data class AuctionDetailDto(
     val lotNumber:       String,
     val createdAt:       String
 )
+
+data class BidDto(
+    val bidId:     String,
+    val userId:    String,
+    val nickname:  String,
+    val avatarUrl: String?,
+    val amount:    Double,
+    val createdAt: String
+)

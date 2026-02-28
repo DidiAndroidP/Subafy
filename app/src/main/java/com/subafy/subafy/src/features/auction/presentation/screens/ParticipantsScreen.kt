@@ -23,11 +23,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.subafy.subafy.src.features.dashboard.presentation.components.ParticipantListItem
 import com.subafy.subafy.src.features.dashboard.presentation.components.ParticipantSearchBar
 import com.subafy.subafy.src.features.dashboard.presentation.components.SessionSummaryCard
-import com.subafy.subafy.src.features.dashboard.presentation.viewModel.ParticipantsViewModel
+import com.subafy.subafy.src.features.auction.presentation.viewModel.ParticipantsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParticipantsScreen(
+    auctionId: String,
     viewModel: ParticipantsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
@@ -108,7 +109,6 @@ fun ParticipantsScreen(
                         nickname = participant.nickname,
                         avatarUrl = participant.avatarUrl,
                         bidCount = participant.bidCount,
-                        timeAgo = participant.timeAgo,
                         isActive = participant.isActive,
                         isWinner = participant.isWinner,
                         modifier = Modifier.animateItem()

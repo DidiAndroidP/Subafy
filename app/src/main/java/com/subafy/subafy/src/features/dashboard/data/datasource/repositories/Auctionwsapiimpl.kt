@@ -61,7 +61,8 @@ class AuctionWsApiImpl @Inject constructor(
     }
 
     override fun sendBidEvent(payload: WsBidPayloadDto) {
-        webSocket?.send(gson.toJson(payload))
+        val json = """{"type":"place_bid","auctionId":"${payload.auctionId}","amount":${payload.amount.toLong()}}"""
+        webSocket?.send(json)
     }
 
     override fun observeEvents(): Flow<String> = _eventsFlow.asSharedFlow()

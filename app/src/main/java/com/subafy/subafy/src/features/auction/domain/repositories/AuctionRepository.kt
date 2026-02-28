@@ -9,5 +9,7 @@ interface AuctionRepository {
     suspend fun createAuction(request: CreateAuctionRequest): Result<AuctionCreated>
     suspend fun getParticipants(): Result<List<Participant>>
 
-    suspend fun getFinalResult(auctionId: String): Result<AuctionFinalResult>
+    suspend fun getFinalResult(auctionId: String, currentUserId: String): Result<AuctionFinalResult>
+
+    suspend fun getAuctionParticipants(auctionId: String): Result<List<Participant>>
 }

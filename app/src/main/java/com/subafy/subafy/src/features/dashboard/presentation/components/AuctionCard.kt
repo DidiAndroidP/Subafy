@@ -84,7 +84,7 @@ fun AuctionCard(
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = timeRemaining,
+                            text = "${secondsToMinutes(timeRemaining)} minutos",
                             color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
@@ -144,4 +144,13 @@ fun AuctionCard(
             }
         }
     }
+}
+
+fun secondsToMinutes(timeInSeconds: String): String {
+    val totalSeconds = timeInSeconds.toLongOrNull() ?: return "00:00"
+
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+
+    return String.format("%02d:%02d", minutes, seconds)
 }
